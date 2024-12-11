@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
 )
 
 type Room struct {
-	num       uint
-	x         uint
-	y         uint
+	name      string
+	x         int
+	y         int
 	connected []*Room
 	hasAnt    bool
 }
@@ -25,28 +26,34 @@ func main() {
 	defer file.Close()
 
 	// Read file contents
-	content := make([]byte, 1024*64) // Adjust buffer size as needed
-	n, err := file.Read(content)
+	content, err := os.ReadFile("test1.txt")
 	if err != nil {
-		fmt.Println("Error reading file:", err)
-		return
+		log.Fatal("Error reading file:", err)
 	}
 
 	// Convert to string and split into lines
-	lines := strings.Split(string(content[:n]), "\n")
+	lines := strings.Split(string(content), "\n")
+
+	ants, err := strconv.Atoi(lines[0])
+	if err != nil {
+		log.Fatal("Invalid number of ants:", err)
+	}
 
 	// Separate rooms and links
-	roomLines, linkLines := splitSections(lines)
+	roomLines, linkLines := splitSections(lines[1:])
 
 	// Parse rooms and links
 	rooms := parseRooms(roomLines)
+	checkDuplicateCoordinates(rooms)
+
 	parseLinks(linkLines, rooms)
 
 	// Debug: Print parsed data
+	fmt.Println("Number of ants:", ants)
 	for _, room := range rooms {
-		fmt.Printf("Room %d (%d, %d): ", room.num, room.x, room.y)
+		fmt.Printf("Room %s (%d, %d): ", room.name, room.x, room.y)
 		for _, connected := range room.connected {
-			fmt.Printf("%d ", connected.num)
+			fmt.Printf("%s ", connected.name)
 		}
 		fmt.Println()
 	}
@@ -77,8 +84,8 @@ func splitSections(lines []string) ([]string, []string) {
 	return roomLines, linkLines
 }
 
-func parseRooms(lines []string) map[uint]*Room {
-	rooms := make(map[uint]*Room)
+func parseRooms(lines []string) map[string]*Room {
+	rooms := make(map[string]*Room)
 
 	for _, line := range lines {
 		if line == "##start" || line == "##end" || line[0] == '#' {
@@ -88,30 +95,46 @@ func parseRooms(lines []string) map[uint]*Room {
 		// Split the line into parts (e.g., "1 23 3")
 		parts := strings.Fields(line)
 		if len(parts) != 3 {
-			fmt.Println("Invalid room format:", line)
-			continue
+			log.Fatal("Invalid room format:", line)
 		}
 
 		// Convert parts to the appropriate types
-		num, _ := strconv.Atoi(parts[0])
-		x, _ := strconv.Atoi(parts[1])
-		y, _ := strconv.Atoi(parts[2])
+		name := parts[0]
+		if strings.HasPrefix(name, "L") {
+			log.Fatal("Invalid room name:", name)
+		}
+		x, err := strconv.Atoi(parts[1])
+		if err != nil {
+			log.Fatal("Invalid room coordinate:", x)
+		}
+		y, err := strconv.Atoi(parts[2])
+		if err != nil {
+			log.Fatal("Invalid room coordinate:", line, y)
+		}
+
+		if x < 0 || y < 0 {
+			log.Fatal("Room coordinates cannot be negative numbers:", line)
+		}
 
 		// Create a new Room and add it to the map
 		room := &Room{
-			num:       uint(num),
-			x:         uint(x),
-			y:         uint(y),
+			name:      name,
+			x:         x,
+			y:         y,
 			connected: []*Room{},
 			hasAnt:    false,
 		}
-		rooms[uint(num)] = room
+		_, exists := rooms[name]
+		if exists {
+			log.Fatal("Duplicate room name:", name)
+		}
+		rooms[name] = room
 	}
 
 	return rooms
 }
 
-func parseLinks(lines []string, rooms map[uint]*Room) {
+func parseLinks(lines []string, rooms map[string]*Room) {
 	for _, line := range lines {
 		if line[0] == '#' {
 			continue // Skip comments
@@ -124,17 +147,18 @@ func parseLinks(lines []string, rooms map[uint]*Room) {
 			continue
 		}
 
-		// Convert room names to uint
-		from, _ := strconv.Atoi(parts[0])
-		to, _ := strconv.Atoi(parts[1])
-
 		// Get the corresponding Room objects
-		roomFrom, okFrom := rooms[uint(from)]
-		roomTo, okTo := rooms[uint(to)]
+		roomFrom, okFrom := rooms[parts[0]]
+		roomTo, okTo := rooms[parts[1]]
 
+		// Check if the rooms exist
 		if !okFrom || !okTo {
-			fmt.Println("Invalid link: unknown room(s)", line)
-			continue
+			log.Fatal("Invalid link: unknown room(s)", line)
+		}
+
+		// Checks if the rooms are the same room
+		if roomFrom == roomTo {
+			log.Fatal("Cannot have a link to the same room:", line)
 		}
 
 		// Add the connection to both rooms
