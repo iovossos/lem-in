@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -48,22 +49,26 @@ func main() {
 
 	// Parse rooms and links
 	rooms, start, end := parseRooms(roomLines)
-	fmt.Println("Start room:", start.name, ", End room:", end.name)
+	//fmt.Println("Start room:", start.name, ", End room:", end.name)
 	checkDuplicateCoordinates(rooms)
 
 	parseLinks(linkLines, rooms)
 
 	calculateDistancesFromEnd(end)
 
+	sortPaths(rooms)
+
 	// Debug: Print parsed data
-	fmt.Println("Number of ants:", ants)
+	/*fmt.Println("Number of ants:", ants)
 	for _, room := range rooms {
 		fmt.Printf("Room %s (%d, %d): ", room.name, room.x, room.y)
 		for _, connected := range room.connected {
 			fmt.Printf("%s ", connected.name)
 		}
 		fmt.Printf(". %d steps from end\n", room.stepsToEnd)
-	}
+	}*/
+
+	startAnts(rune(ants+'0'), start, end)
 }
 
 func splitSections(lines []string) ([]string, []string) {
@@ -223,5 +228,13 @@ func calculateDistancesFromEnd(end *Room) {
 				queue = append(queue, neighbor)
 			}
 		}
+	}
+}
+
+func sortPaths(rooms map[string]*Room) {
+	for _, r := range rooms {
+		sort.Slice(r.connected, func(i, j int) bool {
+			return r.connected[i].stepsToEnd < r.connected[j].stepsToEnd
+		})
 	}
 }
