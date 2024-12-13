@@ -48,7 +48,7 @@ func main() {
 
 	// Parse rooms and links
 	rooms, start, end := parseRooms(roomLines)
-	fmt.Println(start.name, end.name)
+	fmt.Println("Start room:", start.name, ", End room:", end.name)
 	checkDuplicateCoordinates(rooms)
 
 	parseLinks(linkLines, rooms)
@@ -62,7 +62,7 @@ func main() {
 		for _, connected := range room.connected {
 			fmt.Printf("%s ", connected.name)
 		}
-		fmt.Println()
+		fmt.Printf(". %d steps from end\n", room.stepsToEnd)
 	}
 }
 
