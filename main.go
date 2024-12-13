@@ -22,8 +22,7 @@ func main() {
 	// Open the file
 	file, err := os.Open("test1.txt")
 	if err != nil {
-		fmt.Println("Error:", err)
-		return
+		log.Fatal("Error:", err)
 	}
 	defer file.Close()
 
