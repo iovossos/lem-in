@@ -67,7 +67,15 @@ func main() {
 		fmt.Printf(". %d steps from end\n", room.stepsToEnd)
 	}*/
 
-	startAnts(rune(ants+'0'), start, end)
+	paths := findPaths(start, end)
+	for _, path := range paths {
+		for _, room := range path {
+			fmt.Print(room.name + " ")
+		}
+		fmt.Println()
+	}
+
+	//startAnts(ants, start, end)
 }
 
 func splitSections(lines []string) ([]string, []string) {
