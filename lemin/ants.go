@@ -38,30 +38,25 @@ func turns(ants []*Ant, start, end *Room) {
 		if ant.isDead {
 			continue
 		}
-		if len(ant.path) != 0 {
-			if !ant.path[0].hasAnt {
+		if !ant.path[0].hasAnt {
 
-				ant.location.hasAnt = false
-				ant.location = ant.path[0]
-				ant.path = ant.path[1:]
-
-				antsMoved = append(antsMoved, (ant.name + "-" + ant.location.name))
-
-				ant.location.hasAnt = true
-				ant.active = true
-			}
-		} else {
 			ant.location.hasAnt = false
-			ant.location = end
-			ant.isDead = true
+			ant.location = ant.path[0]
+			ant.path = ant.path[1:]
+
 			antsMoved = append(antsMoved, (ant.name + "-" + ant.location.name))
+			if ant.location != end {
+				ant.location.hasAnt = true
+			} else {
+				ant.isDead = true
+			}
 		}
 
-		// if !ant.active {
-		// 	turns(ants, start, end)
-		// }
-
 	}
+
+	// if !ant.active {
+	// 	turns(ants, start, end)
+	// }
 
 	for _, a := range antsMoved {
 		fmt.Print(a + " ")

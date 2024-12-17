@@ -63,16 +63,18 @@ func walkPath(virtualAnt *Ant, start, end *Room, path []*Room) []*Room {
 	for _, room := range virtualAnt.location.connected {
 
 		if !room.visited && room != start {
+			if end.visited {
+				end.visited = false
+			}
 			virtualAnt.location = room
 			newPath := append([]*Room(nil), path...) // Make a copy of the current path
 			newPath = append(newPath, room)          // Add the current room to the path
-
+			room.visited = true
 			if room == end {
 
 				return newPath
 			}
 
-			room.visited = true
 			nextPath := walkPath(virtualAnt, start, end, newPath)
 			if nextPath != nil {
 				return nextPath
