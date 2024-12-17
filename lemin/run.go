@@ -1,5 +1,7 @@
 package lemin
 
+import "fmt"
+
 func Run(arg string) {
 
 	totalAnts, rooms, start, end := readDataFromFile(arg)
@@ -13,12 +15,12 @@ func Run(arg string) {
 	ants := spawnAnts(totalAnts, start, end)
 
 	// //Debug ; Print paths
-	// for _, path := range paths {
-	// 	for _, room := range path {
-	// 		fmt.Print(room.name + " ")
-	// 	}
-	// 	fmt.Println()
-	// }
+	for _, path := range paths {
+		for _, room := range path {
+			fmt.Print(room.name + " ")
+		}
+		fmt.Println()
+	}
 
 	ants = assignPathsToAnts(ants, paths)
 

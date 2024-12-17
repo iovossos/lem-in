@@ -68,7 +68,7 @@ func walkPath(virtualAnt *Ant, start, end *Room, path []*Room) []*Room {
 			newPath = append(newPath, room)          // Add the current room to the path
 
 			if room == end {
-				newPath = append(newPath, room) // Ensure the 'end' room is added to the path
+
 				return newPath
 			}
 
