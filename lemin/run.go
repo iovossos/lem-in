@@ -1,7 +1,5 @@
 package lemin
 
-import "fmt"
-
 func Run(arg string) {
 
 	totalAnts, rooms, start, end := readDataFromFile(arg)
@@ -15,16 +13,25 @@ func Run(arg string) {
 	ants := spawnAnts(totalAnts, start, end)
 
 	// //Debug ; Print paths
-	for _, path := range paths {
-		for _, room := range path {
-			fmt.Print(room.name + " ")
-		}
-		fmt.Println()
-	}
+	// for _, path := range paths {
+	// 	for _, room := range path {
+	// 		fmt.Print(room.name + " ")
+	// 	}
+	// 	fmt.Println()
+	// }
+	var turnsPerPath map[int]int
+	ants, turnsPerPath = assignPathsToAnts(ants, paths)
 
-	ants = assignPathsToAnts(ants, paths)
+	queues := makeQueues(ants, paths)
 
-	turns(ants, start, end)
+	// for _, queue := range queues {
+	// 	for _, ant := range queue {
+	// 		fmt.Print(ant.name)
+	// 	}
+	// 	fmt.Println()
+	// }
+
+	turns(queues, paths, turnsPerPath, end)
 
 	// Debug: Print parsed data
 	/*fmt.Println("Number of ants:", ants)

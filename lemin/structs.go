@@ -11,10 +11,9 @@ type Room struct {
 }
 
 type Ant struct {
-	name       string
-	location   *Room
-	active     bool
-	isDead     bool
-	movesCount int
-	path       []*Room
+	name      string
+	location  *Room
+	isDead    bool
+	pathIndex int
+	path      []*Room
 }

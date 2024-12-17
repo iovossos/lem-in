@@ -21,55 +21,100 @@ func spawnAnts(totalAnts int, start, end *Room) []*Ant {
 	return ants
 }
 
-func turns(ants []*Ant, start, end *Room) {
-
-	aliveFound := false
-	for _, a := range ants {
-		if !a.isDead {
-			aliveFound = true
-			break
-		}
-	}
-	if !aliveFound {
-		return
-	}
-	antsMoved := []string{}
+func makeQueues(ants []*Ant, paths [][]*Room) [][]*Ant {
+	queues := make([][]*Ant, len(paths))
 	for _, ant := range ants {
-		if ant.isDead {
-			continue
+		queues[ant.pathIndex] = append(queues[ant.pathIndex], ant)
+	}
+	return queues
+}
+
+func turns(queues [][]*Ant, paths [][]*Room, turnsPerPath map[int]int, end *Room) {
+	maxTurns := turnsPerPath[0]
+
+	for _, turnsNeeded := range turnsPerPath {
+		if turnsNeeded > maxTurns {
+			maxTurns = turnsNeeded
 		}
-		if !ant.path[0].hasAnt {
+	}
+	for i := 0; i < maxTurns; i++ {
+		antsMoved := []string{}
+		for _, path := range queues {
+			for a, ant := range path {
+				// if i > len(path) {
+				// 	continue
+				// }
+				if a <= i && !ant.isDead {
+					ant.location = ant.path[0]
+					ant.path = ant.path[1:]
 
-			ant.location.hasAnt = false
-			ant.location = ant.path[0]
-			ant.path = ant.path[1:]
+					antsMoved = append(antsMoved, (ant.name + "-" + ant.location.name))
+					if ant.location != end {
+						ant.location.hasAnt = true
+					} else {
+						ant.isDead = true
+					}
+				}
 
-			antsMoved = append(antsMoved, (ant.name + "-" + ant.location.name))
-			if ant.location != end {
-				ant.location.hasAnt = true
-			} else {
-				ant.isDead = true
 			}
 		}
 
+		for _, a := range antsMoved {
+			fmt.Print(a + " ")
+		}
+		fmt.Println()
 	}
-
-	// if !ant.active {
-	// 	turns(ants, start, end)
-	// }
-
-	for _, a := range antsMoved {
-		fmt.Print(a + " ")
-	}
-	fmt.Println()
-	turns(ants, start, end)
 }
 
-func assignPathsToAnts(ants []*Ant, paths [][]*Room) []*Ant {
+// func turns(ants []*Ant, start, end *Room) {
+
+// 	aliveFound := false
+// 	for _, a := range ants {
+// 		if !a.isDead {
+// 			aliveFound = true
+// 			break
+// 		}
+// 	}
+// 	if !aliveFound {
+// 		return
+// 	}
+// 	antsMoved := []string{}
+// 	for _, ant := range ants {
+// 		if ant.isDead {
+// 			continue
+// 		}
+// 		if !ant.path[0].hasAnt {
+
+// 			ant.location.hasAnt = false
+// 			ant.location = ant.path[0]
+// 			ant.path = ant.path[1:]
+
+// 			antsMoved = append(antsMoved, (ant.name + "-" + ant.location.name))
+// 			if ant.location != end {
+// 				ant.location.hasAnt = true
+// 			} else {
+// 				ant.isDead = true
+// 			}
+// 		}
+
+// 	}
+
+// 	// if !ant.active {
+// 	// 	turns(ants, start, end)
+// 	// }
+
+// 	for _, a := range antsMoved {
+// 		fmt.Print(a + " ")
+// 	}
+// 	fmt.Println()
+// 	turns(ants, start, end)
+// }
+
+func assignPathsToAnts(ants []*Ant, paths [][]*Room) ([]*Ant, map[int]int) {
 
 	turnsPerPath := make(map[int]int)
 	for i, path := range paths {
-		turnsPerPath[i] = len(path)
+		turnsPerPath[i] = len(path) - 1
 	}
 
 	for _, ant := range ants {
@@ -82,8 +127,9 @@ func assignPathsToAnts(ants []*Ant, paths [][]*Room) []*Ant {
 			}
 		}
 		ant.path = paths[bestPath]
+		ant.pathIndex = bestPath
 		turnsPerPath[bestPath]++
 
 	}
-	return ants
+	return ants, turnsPerPath
 }
