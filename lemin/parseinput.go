@@ -33,7 +33,6 @@ func readDataFromFile(filename string) (ants int, rooms map[string]*Room, start,
 
 	// Parse rooms and links
 	rooms, start, end = parseRooms(roomLines)
-	//fmt.Println("Start room:", start.name, ", End room:", end.name)
 
 	checkDuplicateCoordinates(rooms)
 

@@ -39,18 +39,6 @@ func sortConnectedBySteps(rooms map[string]*Room) {
 	}
 }
 
-// func findAllStartingPaths(current, end *Room) [][]*Room {
-// 	start := current
-// 	var startingPaths [][]*Room
-// 	var startingPath []*Room
-// 	for _, connected := range current.connected {
-// 		startingPath = append(startingPath, connected)
-// 		current = connected
-// 		findAllStartingPaths(current, end)
-// 	}
-
-// }
-
 func findAllPathSets(startingPaths [][]*Room, start, end *Room) [][][]*Room {
 	var sets [][][]*Room
 
@@ -149,4 +137,45 @@ func walkNonOverlappingPaths(virtualAnt *Ant, start, end *Room, path []*Room) []
 
 	// If no path is found, return nil
 	return nil
+}
+
+func countTurns(totalAnts int, sets [][][]*Room) [][]*Room {
+	turnsPerSet := make(map[int]int)
+
+	for s, set := range sets {
+		var maxTurns int
+		turnsPerPath := make(map[int]int)
+		for i, path := range set {
+			turnsPerPath[i] = len(path) - 1
+		}
+
+		for a := 0; a < totalAnts; a++ {
+			maxTurns = turnsPerPath[0]
+			minTurns := turnsPerPath[0]
+			bestPath := 0
+			for pathIndex, turnsNeeded := range turnsPerPath {
+				if turnsNeeded < minTurns {
+					minTurns = turnsNeeded
+					bestPath = pathIndex
+				}
+				if turnsNeeded > maxTurns {
+					maxTurns = turnsNeeded
+				}
+			}
+
+			turnsPerPath[bestPath]++
+
+		}
+		turnsPerSet[s] = maxTurns
+	}
+	minTurnsNeeded := turnsPerSet[0]
+	optimalPath := 0
+	for pathIndex, turns := range turnsPerSet {
+		if turns < minTurnsNeeded {
+			minTurnsNeeded = turns
+			optimalPath = pathIndex
+		}
+	}
+
+	return sets[optimalPath]
 }
