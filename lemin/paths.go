@@ -39,26 +39,88 @@ func sortConnectedBySteps(rooms map[string]*Room) {
 	}
 }
 
-func findPaths(start, end *Room) [][]*Room {
+// func findAllStartingPaths(current, end *Room) [][]*Room {
+// 	start := current
+// 	var startingPaths [][]*Room
+// 	var startingPath []*Room
+// 	for _, connected := range current.connected {
+// 		startingPath = append(startingPath, connected)
+// 		current = connected
+// 		findAllStartingPaths(current, end)
+// 	}
 
-	var paths [][]*Room
+// }
 
-	for range start.connected {
-		virtualAnt := &Ant{
-			name:     "Bob",
-			location: start,
+func findAllPathSets(startingPaths [][]*Room, start, end *Room) [][][]*Room {
+	var sets [][][]*Room
+
+	for _, startingPath := range startingPaths {
+		var set [][]*Room
+		set = append(set, startingPath)
+		for _, room := range startingPath {
+
+			room.visited = true
+
 		}
-		var path []*Room
-		path = walkPath(virtualAnt, start, end, path)
-		if path != nil {
-			paths = append(paths, path)
+
+		for range start.connected {
+			virtualAnt := &Ant{
+				name:     "Bob",
+				location: start,
+			}
+			var path []*Room
+			path = walkNonOverlappingPaths(virtualAnt, start, end, path)
+			if path != nil {
+				set = append(set, path)
+
+			}
+
 		}
+		sets = append(sets, set)
+
+		for _, path := range set {
+			for _, room := range path {
+				room.visited = false
+			}
+		}
+
 	}
 
-	return paths
+	return sets
 }
 
-func walkPath(virtualAnt *Ant, start, end *Room, path []*Room) []*Room {
+func walkPath(virtualAnt *Ant, start, end *Room, path []*Room) [][]*Room {
+	var allPaths [][]*Room
+	for _, room := range virtualAnt.location.connected {
+
+		if !room.visited && room != start {
+			if end.visited {
+				end.visited = false
+			}
+
+			virtualAnt.location = room
+			room.visited = true
+
+			newPath := append([]*Room(nil), path...) // Make a copy of the current path
+			newPath = append(newPath, room)          // Add the current room to the path
+
+			if room == end {
+				allPaths = append(allPaths, newPath)
+
+			} else {
+
+				paths := walkPath(virtualAnt, start, end, newPath)
+				allPaths = append(allPaths, paths...)
+			}
+
+			// Backtrack by unmarking the room as visited if no valid path was found
+			room.visited = false
+		}
+	}
+	return allPaths
+}
+
+func walkNonOverlappingPaths(virtualAnt *Ant, start, end *Room, path []*Room) []*Room {
 
 	for _, room := range virtualAnt.location.connected {
 
@@ -75,7 +137,7 @@ func walkPath(virtualAnt *Ant, start, end *Room, path []*Room) []*Room {
 				return newPath
 			}
 
-			nextPath := walkPath(virtualAnt, start, end, newPath)
+			nextPath := walkNonOverlappingPaths(virtualAnt, start, end, newPath)
 			if nextPath != nil {
 				return nextPath
 			}

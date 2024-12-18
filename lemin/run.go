@@ -1,16 +1,47 @@
 package lemin
 
+import "fmt"
+
 func Run(arg string) {
 
 	totalAnts, rooms, start, end := readDataFromFile(arg)
+	fmt.Println(totalAnts)
 
 	calculateDistancesFromEnd(end)
 
 	sortConnectedBySteps(rooms)
 
-	paths := findPaths(start, end)
+	virtualAnt := &Ant{
+		name:     "Bob",
+		location: start,
+	}
+	startingPaths := walkPath(virtualAnt, start, end, []*Room{start})
 
-	ants := spawnAnts(totalAnts, start, end)
+	allPathSets := findAllPathSets(startingPaths, start, end)
+
+	for _, set := range allPathSets {
+		for _, path := range set {
+			for _, room := range path {
+				fmt.Print(room.name + " ")
+			}
+			fmt.Println()
+		}
+		fmt.Println()
+	}
+
+	// sets := findPaths(start, end)
+
+	// for _, set := range sets {
+	// 	for _, path := range set {
+	// 		for _, room := range path {
+	// 			fmt.Print(room.name + " ")
+	// 		}
+	// 		fmt.Println()
+	// 	}
+	// 	fmt.Println()
+	// }
+
+	//ants := spawnAnts(totalAnts, start, end)
 
 	// //Debug ; Print paths
 	// for _, path := range paths {
@@ -19,10 +50,11 @@ func Run(arg string) {
 	// 	}
 	// 	fmt.Println()
 	// }
-	var turnsPerPath map[int]int
-	ants, turnsPerPath = assignPathsToAnts(ants, paths)
 
-	queues := makeQueues(ants, paths)
+	// var turnsPerPath map[int]int
+	// ants, turnsPerPath = assignPathsToAnts(ants, paths)
+
+	// queues := makeQueues(ants, paths)
 
 	// for _, queue := range queues {
 	// 	for _, ant := range queue {
@@ -31,7 +63,7 @@ func Run(arg string) {
 	// 	fmt.Println()
 	// }
 
-	turns(queues, paths, turnsPerPath, end)
+	//	turns(queues, paths, turnsPerPath, end)
 
 	// Debug: Print parsed data
 	/*fmt.Println("Number of ants:", ants)

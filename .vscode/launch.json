@@ -11,7 +11,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}",
-            "args": "example02.txt"
+            "args": "example01.txt"
         }
     ]
 }
