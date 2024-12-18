@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
+// Validate file & parse ant number, room map, start, end
 func readDataFromFile(filename string) (ants int, rooms map[string]*Room, start, end *Room) {
-
 	// Read file contents
 	content, err := os.ReadFile("mazes/" + filename)
 	if err != nil {
@@ -20,6 +20,7 @@ func readDataFromFile(filename string) (ants int, rooms map[string]*Room, start,
 	lines := strings.Split(string(content), "\n")
 
 	//Get number of ants
+	lines[0] = strings.TrimSpace(lines[0])
 	ants, err = strconv.Atoi(lines[0])
 	if err != nil {
 		log.Fatal("Invalid number of ants:", err)
