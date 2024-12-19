@@ -16,10 +16,10 @@ func Run(arg string) {
 
 	ants := spawnAnts(totalAnts, start)
 
-	var turnsPerPath map[int]int
-	ants, turnsPerPath = assignPathsToAnts(ants, optimalSet)
+	ants, turnsPerPath := assignPathsToAnts(ants, optimalSet)
 
 	queues := makeQueues(ants, optimalSet)
 
 	startAnts(queues, turnsPerPath, end)
+
 }

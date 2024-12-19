@@ -2,6 +2,7 @@ package lemin
 
 import "sort"
 
+// Initialize each Room struct stepsToEnd int.
 func calculateDistancesFromEnd(end *Room) {
 	// Initialize BFS queue and visited set
 	queue := []*Room{end}           // Start BFS from the end room
@@ -31,6 +32,7 @@ func calculateDistancesFromEnd(end *Room) {
 	}
 }
 
+// Sort connecting rooms by steps to the end.
 func sortConnectedBySteps(rooms map[string]*Room) {
 	for _, room := range rooms {
 		sort.Slice(room.connected, func(i, j int) bool {
@@ -39,7 +41,7 @@ func sortConnectedBySteps(rooms map[string]*Room) {
 	}
 }
 
-// Find all sets of paths, based on the starting paths
+// Find all sets of paths, based on the starting paths.
 func findAllPathSets(startingPaths [][]*Room, start, end *Room) [][][]*Room {
 	var sets [][][]*Room
 
@@ -47,9 +49,7 @@ func findAllPathSets(startingPaths [][]*Room, start, end *Room) [][][]*Room {
 		var set [][]*Room
 		set = append(set, startingPath)
 		for _, room := range startingPath {
-
 			room.visited = true
-
 		}
 
 		for range start.connected {
@@ -61,9 +61,7 @@ func findAllPathSets(startingPaths [][]*Room, start, end *Room) [][][]*Room {
 			path = walkNonOverlappingPaths(virtualAnt, start, end, path)
 			if path != nil {
 				set = append(set, path)
-
 			}
-
 		}
 		sets = append(sets, set)
 
@@ -120,7 +118,6 @@ func walkNonOverlappingPaths(virtualAnt *Ant, start, end *Room, path []*Room) []
 			newPath = append(newPath, room)          // Add the current room to the path
 			room.visited = true
 			if room == end {
-
 				return newPath
 			}
 
@@ -138,7 +135,7 @@ func walkNonOverlappingPaths(virtualAnt *Ant, start, end *Room, path []*Room) []
 	return nil
 }
 
-// Count the turns needed for each set based on the number of ants & return the optimal set
+// Count the turns needed for each set based on the number of ants & return the optimal set.
 func countTurns(totalAnts int, sets [][][]*Room) [][]*Room {
 	turnsPerSet := make(map[int]int)
 

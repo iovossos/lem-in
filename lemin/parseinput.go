@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// Validate file & parse ant number, room map, start, end
+// Validate file, parse ant number, room map, start, end, print everything.
 func readDataFromFile(filename string) (ants int, rooms map[string]*Room, start, end *Room) {
 	// Read file contents
 	content, err := os.ReadFile("mazes/" + filename)
@@ -16,7 +16,7 @@ func readDataFromFile(filename string) (ants int, rooms map[string]*Room, start,
 		log.Fatal("Error reading file:", err)
 	}
 
-	// Convert to string and split into lines
+	// Convert to string and split into lines.
 	lines := strings.Split(string(content), "\n")
 
 	//Get number of ants
@@ -29,7 +29,7 @@ func readDataFromFile(filename string) (ants int, rooms map[string]*Room, start,
 		log.Fatal("Ant number must be higher than 0.")
 	}
 
-	// Separate rooms and links
+	// Separate rooms and links.
 	roomLines, linkLines := splitSections(lines[1:])
 
 	// Parse rooms and links
@@ -39,8 +39,12 @@ func readDataFromFile(filename string) (ants int, rooms map[string]*Room, start,
 
 	parseLinks(linkLines, rooms)
 
+	//Print the file
+	for i := range lines {
+		fmt.Println(lines[i])
+	}
+	fmt.Println()
 	return
-
 }
 
 func checkDuplicateCoordinates(rooms map[string]*Room) {
@@ -149,7 +153,6 @@ func parseRooms(lines []string) (map[string]*Room, *Room, *Room) {
 	if end == nil {
 		log.Fatal("End room not defined")
 	}
-
 	return rooms, start, end
 }
 

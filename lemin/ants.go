@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// Initialize a slice of ants with location: start
+// Initialize a slice of ants with location: start.
 func spawnAnts(totalAnts int, start *Room) []*Ant {
 	ants := []*Ant{}
 
@@ -18,11 +18,10 @@ func spawnAnts(totalAnts int, start *Room) []*Ant {
 		}
 		ants = append(ants, ant)
 	}
-
 	return ants
 }
 
-// Makes queues with the paths each ants takes
+// Makes queues with the paths each ants takes.
 func makeQueues(ants []*Ant, paths [][]*Room) [][]*Ant {
 	queues := make([][]*Ant, len(paths))
 	for _, ant := range ants {
@@ -57,7 +56,7 @@ func startAnts(queues [][]*Ant, turnsPerPath map[int]int, end *Room) {
 			}
 		}
 
-		// Sort antsMoved to ensure ants are printed in order
+		// Sort antsMoved to ensure ants are printed in order.
 		sort.Slice(antsMoved, func(i, j int) bool {
 			// Extract the ant number from the string (e.g., "L1" from "L1-room")
 			numI, _ := strconv.Atoi(antsMoved[i][1:strings.Index(antsMoved[i], "-")])
@@ -92,7 +91,6 @@ func assignPathsToAnts(ants []*Ant, paths [][]*Room) ([]*Ant, map[int]int) {
 		ant.path = paths[bestPath]
 		ant.pathIndex = bestPath
 		turnsPerPath[bestPath]++
-
 	}
 	return ants, turnsPerPath
 }
