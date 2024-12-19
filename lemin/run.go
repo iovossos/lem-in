@@ -8,12 +8,7 @@ func Run(arg string) {
 
 	sortConnectedBySteps(rooms)
 
-	virtualAnt := &Ant{
-		name:     "Bob",
-		location: start,
-	}
-
-	startingPaths := findAllStartingPaths(virtualAnt, start, end, []*Room{})
+	startingPaths := findAllStartingPaths(start, end, []*Room{})
 
 	allPathSets := findAllPathSets(startingPaths, start, end)
 

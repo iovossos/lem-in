@@ -2,7 +2,9 @@ package lemin
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 // Initialize a slice of ants with location: start
@@ -29,7 +31,7 @@ func makeQueues(ants []*Ant, paths [][]*Room) [][]*Ant {
 	return queues
 }
 
-// Sending ants turn by turn.
+// Sends ants turn by turn, printing each turn sorted.
 func startAnts(queues [][]*Ant, turnsPerPath map[int]int, end *Room) {
 	maxTurns := turnsPerPath[0]
 
@@ -54,6 +56,14 @@ func startAnts(queues [][]*Ant, turnsPerPath map[int]int, end *Room) {
 				}
 			}
 		}
+
+		// Sort antsMoved to ensure ants are printed in order
+		sort.Slice(antsMoved, func(i, j int) bool {
+			// Extract the ant number from the string (e.g., "L1" from "L1-room")
+			numI, _ := strconv.Atoi(antsMoved[i][1:strings.Index(antsMoved[i], "-")])
+			numJ, _ := strconv.Atoi(antsMoved[j][1:strings.Index(antsMoved[j], "-")])
+			return numI < numJ
+		})
 
 		for _, a := range antsMoved {
 			fmt.Print(a + " ")

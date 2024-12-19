@@ -79,16 +79,15 @@ func findAllPathSets(startingPaths [][]*Room, start, end *Room) [][][]*Room {
 }
 
 // Find every possible unique path from the start room to the end room.
-func findAllStartingPaths(virtualAnt *Ant, start, end *Room, path []*Room) [][]*Room {
+func findAllStartingPaths(start, end *Room, path []*Room) [][]*Room {
 	var allPaths [][]*Room
-	for _, room := range virtualAnt.location.connected {
 
+	for _, room := range start.connected {
 		if !room.visited && room != start {
 			if end.visited {
 				end.visited = false
 			}
 
-			virtualAnt.location = room
 			room.visited = true
 
 			newPath := append([]*Room(nil), path...) // Make a copy of the current path
@@ -96,14 +95,12 @@ func findAllStartingPaths(virtualAnt *Ant, start, end *Room, path []*Room) [][]*
 
 			if room == end {
 				allPaths = append(allPaths, newPath)
-
 			} else {
-
-				paths := findAllStartingPaths(virtualAnt, start, end, newPath)
+				paths := findAllStartingPaths(room, end, newPath)
 				allPaths = append(allPaths, paths...)
 			}
 
-			// Backtrack by unmarking the room as visited if no valid path was found
+			// Backtrack by unmarking the room as visited
 			room.visited = false
 		}
 	}
