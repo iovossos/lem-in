@@ -12,19 +12,19 @@ func Run(arg string) {
 		name:     "Bob",
 		location: start,
 	}
-	startingPaths := walkPath(virtualAnt, start, end, []*Room{})
+
+	startingPaths := findAllStartingPaths(virtualAnt, start, end, []*Room{})
 
 	allPathSets := findAllPathSets(startingPaths, start, end)
 
-	optimalPaths := countTurns(totalAnts, allPathSets)
+	optimalSet := countTurns(totalAnts, allPathSets)
 
 	ants := spawnAnts(totalAnts, start)
 
 	var turnsPerPath map[int]int
-	ants, turnsPerPath = assignPathsToAnts(ants, optimalPaths)
+	ants, turnsPerPath = assignPathsToAnts(ants, optimalSet)
 
-	queues := makeQueues(ants, optimalPaths)
+	queues := makeQueues(ants, optimalSet)
 
-	turns(queues, turnsPerPath, end)
-
+	startAnts(queues, turnsPerPath, end)
 }

@@ -5,6 +5,7 @@ import (
 	"strconv"
 )
 
+// Initialize a slice of ants with location: start
 func spawnAnts(totalAnts int, start *Room) []*Ant {
 	ants := []*Ant{}
 
@@ -19,6 +20,7 @@ func spawnAnts(totalAnts int, start *Room) []*Ant {
 	return ants
 }
 
+// Makes queues with the paths each ants takes
 func makeQueues(ants []*Ant, paths [][]*Room) [][]*Ant {
 	queues := make([][]*Ant, len(paths))
 	for _, ant := range ants {
@@ -27,7 +29,8 @@ func makeQueues(ants []*Ant, paths [][]*Room) [][]*Ant {
 	return queues
 }
 
-func turns(queues [][]*Ant, turnsPerPath map[int]int, end *Room) {
+// Sending ants turn by turn.
+func startAnts(queues [][]*Ant, turnsPerPath map[int]int, end *Room) {
 	maxTurns := turnsPerPath[0]
 
 	for _, turnsNeeded := range turnsPerPath {
@@ -39,11 +42,9 @@ func turns(queues [][]*Ant, turnsPerPath map[int]int, end *Room) {
 		antsMoved := []string{}
 		for _, path := range queues {
 			for a, ant := range path {
-
 				if a <= i && !ant.isDead {
 					ant.location = ant.path[0]
 					ant.path = ant.path[1:]
-
 					antsMoved = append(antsMoved, (ant.name + "-" + ant.location.name))
 					if ant.location != end {
 						ant.location.hasAnt = true
@@ -51,7 +52,6 @@ func turns(queues [][]*Ant, turnsPerPath map[int]int, end *Room) {
 						ant.isDead = true
 					}
 				}
-
 			}
 		}
 
@@ -62,6 +62,7 @@ func turns(queues [][]*Ant, turnsPerPath map[int]int, end *Room) {
 	}
 }
 
+// Assigns paths to ants based on the minimum number of turns needed to reach the end room.
 func assignPathsToAnts(ants []*Ant, paths [][]*Room) ([]*Ant, map[int]int) {
 
 	turnsPerPath := make(map[int]int)

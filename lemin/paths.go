@@ -32,13 +32,14 @@ func calculateDistancesFromEnd(end *Room) {
 }
 
 func sortConnectedBySteps(rooms map[string]*Room) {
-	for _, r := range rooms {
-		sort.Slice(r.connected, func(i, j int) bool {
-			return r.connected[i].stepsToEnd < r.connected[j].stepsToEnd
+	for _, room := range rooms {
+		sort.Slice(room.connected, func(i, j int) bool {
+			return room.connected[i].stepsToEnd < room.connected[j].stepsToEnd
 		})
 	}
 }
 
+// Find all sets of paths, based on the starting paths
 func findAllPathSets(startingPaths [][]*Room, start, end *Room) [][][]*Room {
 	var sets [][][]*Room
 
@@ -77,7 +78,8 @@ func findAllPathSets(startingPaths [][]*Room, start, end *Room) [][][]*Room {
 	return sets
 }
 
-func walkPath(virtualAnt *Ant, start, end *Room, path []*Room) [][]*Room {
+// Find every possible unique path from the start room to the end room.
+func findAllStartingPaths(virtualAnt *Ant, start, end *Room, path []*Room) [][]*Room {
 	var allPaths [][]*Room
 	for _, room := range virtualAnt.location.connected {
 
@@ -97,7 +99,7 @@ func walkPath(virtualAnt *Ant, start, end *Room, path []*Room) [][]*Room {
 
 			} else {
 
-				paths := walkPath(virtualAnt, start, end, newPath)
+				paths := findAllStartingPaths(virtualAnt, start, end, newPath)
 				allPaths = append(allPaths, paths...)
 			}
 
@@ -139,6 +141,7 @@ func walkNonOverlappingPaths(virtualAnt *Ant, start, end *Room, path []*Room) []
 	return nil
 }
 
+// Count the turns needed for each set based on the number of ants & return the optimal set
 func countTurns(totalAnts int, sets [][][]*Room) [][]*Room {
 	turnsPerSet := make(map[int]int)
 
