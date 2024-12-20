@@ -17,8 +17,7 @@ Lem-in reads a map description from a file, which includes the number of ants, r
 
 1. Ensure you have Go installed on your system (version 1.22.2 or later).
 2. Clone this repository: https://platform.zone01.gr/git/ivossos/lem-in
-
-3. Run the program with a maze file as an argument:
+3. Run the program with a maze file as an argument. All maze files should be in the mazes folder.
 
 
 ## Project Structure
@@ -37,16 +36,35 @@ Lem-in reads a map description from a file, which includes the number of ants, r
 1. Read and parse the input file
 2. Calculate distances from each room to the end
 3. Sort connected rooms by distance to end
-4. Find all possible path sets
-5. Calculate the optimal set of paths
+4. Find all possible non-overlapping path sets
+5. Calculate the optimal set of paths for the given number of ants
 6. Assign ants to paths
 7. Simulate ant movement through the colony
 
 ## Input File Format
 
-The input file should follow this format: 
-Example:
+#### The input file should follow this format: 
+- The first line is a number indicating the number of ants
+- The next lines are the rooms, in this format:
+`Name_of_room x_coordinate y_coordinate`      
+- There must be at least one start room and one end room, indicated by this comment in the previous line:
+`## start` or `##end`
+- Immediately after the rooms, the tunnels are listed. These are the names of the rooms connected by the tunnel with a dash between them, like this:
+`room1-room2` 
 
+Example:
+```
+3
+##start
+0 1 0
+##end
+1 5 0
+2 9 0
+3 13 0
+0-2
+2-3
+3-1
+```
 
 ## Authors
 
