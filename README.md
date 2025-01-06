@@ -6,6 +6,22 @@ Lem-in is a pathfinding algorithm project that simulates ant colony movements th
 
 Lem-in reads a map description from a file, which includes the number of ants, room definitions, and connections between rooms. The goal is to find the optimal path(s) to move all ants from the start room to the end room in the least number of turns possible.
 
+## Dependencies
+### Go
+- Go 1.22.2 or Later
+### Python (for visualization)
+- Python 3.11 or later
+- Pygame library
+
+## Instalation 
+1. Install Go from https://golang.org/
+2. For visualization:
+  - Install Python from https://python.org/
+  - Install Pygame:
+  ```
+    pip install pygame
+  ```
+
 ## Features
 
 - Parses input files describing the ant colony structure
@@ -19,6 +35,14 @@ Lem-in reads a map description from a file, which includes the number of ants, r
 2. Clone this repository: https://platform.zone01.gr/git/ivossos/lem-in
 3. Run the program with a maze file as an argument. All maze files should be in the mazes folder.
 
+e.g go run . example05.txt
+e.g (with visualization) go run . example05.txt | python visualizer.py
+
+## Visualization Controls
+* SPACE: Play/Pause animation
+* LEFT/RIGHT Arrows: Navigate between moves when paused
+* ESC: Exit visualization
+
 
 ## Project Structure
 
@@ -30,6 +54,7 @@ Lem-in reads a map description from a file, which includes the number of ants, r
   - `run.go`: Main execution logic
   - `structs.go`: Data structures used in the project
 - `mazes/`: Directory containing example maze files
+- `visualizer.py`: Visualization 
 
 ## Algorithm Overview
 
