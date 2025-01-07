@@ -53,18 +53,17 @@ e.g (with visualization) go run . example05.txt | python visualizer.py
   - `paths.go`: Path finding and optimization
   - `run.go`: Main execution logic
   - `structs.go`: Data structures used in the project
+  - `helper.go`: Helper functions called from both in paths.go and ants.go
 - `mazes/`: Directory containing example maze files
 - `visualizer.py`: Visualization 
 
 ## Algorithm Overview
 
 1. Read and parse the input file
-2. Calculate distances from each room to the end
-3. Sort connected rooms by distance to end
-4. Find all possible non-overlapping path sets
-5. Calculate the optimal set of paths for the given number of ants
-6. Assign ants to paths
-7. Simulate ant movement through the colony
+2. Find all possible non-overlapping path sets
+3. Calculate the optimal set of paths for the given number of ants
+4. Assign ants to paths
+5. Simulate ant movement through the colony
 
 ## Input File Format
 

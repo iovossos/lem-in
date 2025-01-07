@@ -21,6 +21,20 @@ func spawnAnts(totalAnts int, start *Room) []*Ant {
 	return ants
 }
 
+// Assigns paths to ants based on the minimum number of turns needed to reach the end room.
+func assignPathsToAnts(ants []*Ant, paths [][]*Room) ([]*Ant, map[int]int) {
+
+	turnsPerPath := initializeTurnsMap(paths)
+
+	for _, ant := range ants {
+		bestPath := findPathWithFewerTurns(turnsPerPath)
+		ant.path = paths[bestPath]
+		ant.pathIndex = bestPath
+		turnsPerPath[bestPath]++
+	}
+	return ants, turnsPerPath
+}
+
 // Makes queues with the paths each ants takes.
 func makeQueues(ants []*Ant, paths [][]*Room) [][]*Ant {
 	queues := make([][]*Ant, len(paths))
@@ -32,13 +46,7 @@ func makeQueues(ants []*Ant, paths [][]*Room) [][]*Ant {
 
 // Sends ants turn by turn, printing each turn sorted.
 func startAnts(queues [][]*Ant, turnsPerPath map[int]int, end *Room) {
-	maxTurns := turnsPerPath[0]
-
-	for _, turnsNeeded := range turnsPerPath {
-		if turnsNeeded > maxTurns {
-			maxTurns = turnsNeeded
-		}
-	}
+	maxTurns := findMaxTurnsNeeded(turnsPerPath)
 	for i := 0; i < maxTurns; i++ {
 		antsMoved := []string{}
 		for _, path := range queues {
@@ -47,9 +55,7 @@ func startAnts(queues [][]*Ant, turnsPerPath map[int]int, end *Room) {
 					ant.location = ant.path[0]
 					ant.path = ant.path[1:]
 					antsMoved = append(antsMoved, (ant.name + "-" + ant.location.name))
-					if ant.location != end {
-						ant.location.hasAnt = true
-					} else {
+					if ant.location == end {
 						ant.isDead = true
 					}
 				}
@@ -69,28 +75,4 @@ func startAnts(queues [][]*Ant, turnsPerPath map[int]int, end *Room) {
 		}
 		fmt.Println()
 	}
-}
-
-// Assigns paths to ants based on the minimum number of turns needed to reach the end room.
-func assignPathsToAnts(ants []*Ant, paths [][]*Room) ([]*Ant, map[int]int) {
-
-	turnsPerPath := make(map[int]int)
-	for i, path := range paths {
-		turnsPerPath[i] = len(path) - 1
-	}
-
-	for _, ant := range ants {
-		minTurns := turnsPerPath[0]
-		bestPath := 0
-		for pathIndex, turnsNeeded := range turnsPerPath {
-			if turnsNeeded < minTurns {
-				minTurns = turnsNeeded
-				bestPath = pathIndex
-			}
-		}
-		ant.path = paths[bestPath]
-		ant.pathIndex = bestPath
-		turnsPerPath[bestPath]++
-	}
-	return ants, turnsPerPath
 }

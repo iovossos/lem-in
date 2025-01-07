@@ -1,13 +1,11 @@
 package lemin
 
 type Room struct {
-	name       string
-	x          int
-	y          int
-	connected  []*Room
-	hasAnt     bool
-	visited    bool
-	stepsToEnd int
+	name      string
+	x         int
+	y         int
+	connected []*Room
+	visited   bool
 }
 
 type Ant struct {

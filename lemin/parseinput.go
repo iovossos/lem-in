@@ -9,7 +9,7 @@ import (
 )
 
 // Validate file, parse ant number, room map, start, end, print everything.
-func readDataFromFile(filename string) (ants int, rooms map[string]*Room, start, end *Room) {
+func readDataFromFile(filename string) (ants int, start, end *Room) {
 	// Read file contents
 	content, err := os.ReadFile("mazes/" + filename)
 	if err != nil {
@@ -33,6 +33,7 @@ func readDataFromFile(filename string) (ants int, rooms map[string]*Room, start,
 	roomLines, linkLines := splitSections(lines[1:])
 
 	// Parse rooms and links
+	var rooms map[string]*Room
 	rooms, start, end = parseRooms(roomLines)
 
 	checkDuplicateCoordinates(rooms)
@@ -41,7 +42,9 @@ func readDataFromFile(filename string) (ants int, rooms map[string]*Room, start,
 
 	//Print the file
 	for i := range lines {
-		fmt.Println(lines[i])
+		if lines[i] != "" {
+			fmt.Println(lines[i])
+		}
 	}
 	fmt.Println()
 	return
@@ -130,7 +133,6 @@ func parseRooms(lines []string) (map[string]*Room, *Room, *Room) {
 			x:         x,
 			y:         y,
 			connected: []*Room{},
-			hasAnt:    false,
 		}
 		if startFound {
 			start = room

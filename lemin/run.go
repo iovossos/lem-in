@@ -2,15 +2,11 @@ package lemin
 
 func Run(arg string) {
 
-	totalAnts, rooms, start, end := readDataFromFile(arg)
+	totalAnts, start, end := readDataFromFile(arg)
 
-	calculateDistancesFromEnd(end)
+	allPaths := findAllPaths(start, end, start, []*Room{})
 
-	sortConnectedBySteps(rooms)
-
-	startingPaths := findAllStartingPaths(start, end, []*Room{})
-
-	allPathSets := findAllPathSets(startingPaths, start, end)
+	allPathSets := findAllPathSets(allPaths, end)
 
 	optimalSet := countTurns(totalAnts, allPathSets)
 
