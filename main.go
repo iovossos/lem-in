@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"lemin/lemin"
+	"log"
 	"os"
 )
 
@@ -11,6 +12,9 @@ func main() {
 		fmt.Println("Usage: go run . [mazename.txt]")
 		return
 	}
-	lemin.Run(os.Args[1])
+	err := lemin.Run(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }

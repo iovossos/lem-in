@@ -1,7 +1,9 @@
 package lemin
 
+import "errors"
+
 // Find every possible unique path from the start room to the end room.
-func findAllPaths(start, end, current *Room, path []*Room) [][]*Room {
+func findAllPaths(start, end, current *Room, path []*Room) ([][]*Room, error) {
 	var allPaths [][]*Room
 
 	for _, room := range current.connected {
@@ -18,7 +20,7 @@ func findAllPaths(start, end, current *Room, path []*Room) [][]*Room {
 			if room == end {
 				allPaths = append(allPaths, newPath)
 			} else {
-				paths := findAllPaths(start, end, room, newPath)
+				paths, _ := findAllPaths(start, end, room, newPath)
 				allPaths = append(allPaths, paths...)
 			}
 
@@ -26,7 +28,11 @@ func findAllPaths(start, end, current *Room, path []*Room) [][]*Room {
 			room.visited = false
 		}
 	}
-	return allPaths
+	if len(allPaths) == 0 {
+		return allPaths, errors.New("No valid path between Start and End")
+	}
+
+	return allPaths, nil
 }
 
 // findAllPathSets returns all possible combinations of non-overlapping paths

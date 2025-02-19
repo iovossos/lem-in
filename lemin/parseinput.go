@@ -1,19 +1,19 @@
 package lemin
 
 import (
+	"errors"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
 )
 
 // Validate file, parse ant number, room map, start, end, print everything.
-func readDataFromFile(filename string) (ants int, start, end *Room) {
+func readDataFromFile(filename string) (ants int, start, end *Room, err error) {
 	// Read file contents
 	content, err := os.ReadFile("mazes/" + filename)
 	if err != nil {
-		log.Fatal("Error reading file:", err)
+		return 0, nil, nil, fmt.Errorf("error reading file: %v", err)
 	}
 
 	// Convert to string and split into lines.
@@ -23,10 +23,10 @@ func readDataFromFile(filename string) (ants int, start, end *Room) {
 	lines[0] = strings.TrimSpace(lines[0])
 	ants, err = strconv.Atoi(lines[0])
 	if err != nil {
-		log.Fatal("Invalid number of ants:", err)
+		return 0, nil, nil, fmt.Errorf("invalid number of ants: %v", err)
 	}
 	if ants <= 0 {
-		log.Fatal("Ant number must be higher than 0.")
+		return 0, nil, nil, errors.New("ant number must be higher than 0")
 	}
 
 	// Separate rooms and links.
@@ -34,11 +34,20 @@ func readDataFromFile(filename string) (ants int, start, end *Room) {
 
 	// Parse rooms and links
 	var rooms map[string]*Room
-	rooms, start, end = parseRooms(roomLines)
+	rooms, start, end, err = parseRooms(roomLines)
+	if err != nil {
+		return 0, nil, nil, err
+	}
 
-	checkDuplicateCoordinates(rooms)
+	err = checkDuplicateCoordinates(rooms)
+	if err != nil {
+		return 0, nil, nil, err
+	}
 
-	parseLinks(linkLines, rooms)
+	err = parseLinks(linkLines, rooms)
+	if err != nil {
+		return 0, nil, nil, err
+	}
 
 	//Print the file
 	for i := range lines {
@@ -50,16 +59,17 @@ func readDataFromFile(filename string) (ants int, start, end *Room) {
 	return
 }
 
-func checkDuplicateCoordinates(rooms map[string]*Room) {
+func checkDuplicateCoordinates(rooms map[string]*Room) error {
 	coordinates := make(map[string]bool)
 	for roomName, room := range rooms {
-		xy := strconv.Itoa(room.x) + strconv.Itoa(room.y)
+		xy := strconv.Itoa(room.x) + "-" + strconv.Itoa(room.y)
 		_, exists := coordinates[xy]
 		if exists {
-			log.Fatal("Room with duplicate coordinates:", roomName, xy)
+			return fmt.Errorf("room %v has duplicate coordinates: %v", roomName, xy)
 		}
 		coordinates[xy] = true
 	}
+	return nil
 }
 
 func splitSections(lines []string) ([]string, []string) {
@@ -87,7 +97,7 @@ func splitSections(lines []string) ([]string, []string) {
 	return roomLines, linkLines
 }
 
-func parseRooms(lines []string) (map[string]*Room, *Room, *Room) {
+func parseRooms(lines []string) (map[string]*Room, *Room, *Room, error) {
 	rooms := make(map[string]*Room)
 	startFound := false
 	endFound := false
@@ -106,25 +116,25 @@ func parseRooms(lines []string) (map[string]*Room, *Room, *Room) {
 		// Split the line into parts (e.g., "1 23 3")
 		parts := strings.Fields(line)
 		if len(parts) != 3 {
-			log.Fatal("Invalid room format:", line)
+			return rooms, nil, nil, fmt.Errorf("invalid room format: %v", line)
 		}
 
 		// Convert parts to the appropriate types
 		name := parts[0]
 		if strings.HasPrefix(name, "L") {
-			log.Fatal("Invalid room name:", name)
+			return rooms, nil, nil, fmt.Errorf("invalid room name: %v", name)
 		}
 		x, err := strconv.Atoi(parts[1])
 		if err != nil {
-			log.Fatal("Invalid room coordinate:", x)
+			return rooms, nil, nil, fmt.Errorf("invalid room coordinate: %v", x)
 		}
 		y, err := strconv.Atoi(parts[2])
 		if err != nil {
-			log.Fatal("Invalid room coordinate:", line, y)
+			return rooms, nil, nil, fmt.Errorf("invalid room coordinate: %v, %v", line, y)
 		}
 
 		if x < 0 || y < 0 {
-			log.Fatal("Room coordinates cannot be negative numbers:", line)
+			return rooms, nil, nil, fmt.Errorf("room coordinates cannot be negative numbers: %v", line)
 		}
 
 		// Create a new Room and add it to the map
@@ -143,22 +153,22 @@ func parseRooms(lines []string) (map[string]*Room, *Room, *Room) {
 		}
 		_, exists := rooms[name]
 		if exists {
-			log.Fatal("Duplicate room name:", name)
+			return rooms, nil, nil, fmt.Errorf("duplicate room name: %v", name)
 		}
 		rooms[name] = room
 	}
 
 	// If start or end is not found, log an error
 	if start == nil {
-		log.Fatal("Start room not defined")
+		return rooms, nil, nil, errors.New("start room not defined")
 	}
 	if end == nil {
-		log.Fatal("End room not defined")
+		return rooms, nil, nil, errors.New("end room not defined")
 	}
-	return rooms, start, end
+	return rooms, start, end, nil
 }
 
-func parseLinks(lines []string, rooms map[string]*Room) {
+func parseLinks(lines []string, rooms map[string]*Room) error {
 	for _, line := range lines {
 		if line[0] == '#' {
 			continue // Skip comments
@@ -167,8 +177,7 @@ func parseLinks(lines []string, rooms map[string]*Room) {
 		// Split the link into two room names (e.g., "0-4")
 		parts := strings.Split(line, "-")
 		if len(parts) != 2 {
-			fmt.Println("Invalid link format:", line)
-			continue
+			return fmt.Errorf("invalid link format: %v", line)
 		}
 
 		// Get the corresponding Room objects
@@ -177,16 +186,17 @@ func parseLinks(lines []string, rooms map[string]*Room) {
 
 		// Check if the rooms exist
 		if !okFrom || !okTo {
-			log.Fatal("Invalid link: unknown room(s)", line)
+			return fmt.Errorf("invalid link: unknown room(s): %v", line)
 		}
 
 		// Checks if the rooms are the same room
 		if roomFrom == roomTo {
-			log.Fatal("Cannot have a link to the same room:", line)
+			return fmt.Errorf("cannot have a link to the same room: %v", line)
 		}
 
 		// Add the connection to both rooms
 		roomFrom.connected = append(roomFrom.connected, roomTo)
 		roomTo.connected = append(roomTo.connected, roomFrom)
 	}
+	return nil
 }

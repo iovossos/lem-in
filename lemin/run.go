@@ -1,10 +1,16 @@
 package lemin
 
-func Run(arg string) {
+func Run(arg string) error {
 
-	totalAnts, start, end := readDataFromFile(arg)
+	totalAnts, start, end, err := readDataFromFile(arg)
+	if err != nil {
+		return err
+	}
 
-	allPaths := findAllPaths(start, end, start, []*Room{})
+	allPaths, err := findAllPaths(start, end, start, []*Room{})
+	if err != nil {
+		return err
+	}
 
 	allPathSets := findAllPathSets(allPaths, end)
 
@@ -18,4 +24,5 @@ func Run(arg string) {
 
 	startAnts(queues, turnsPerPath, end)
 
+	return nil
 }
