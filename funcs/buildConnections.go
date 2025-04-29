@@ -1,8 +1,9 @@
 package funcs
 
 // buildConnections creates an adjacency list from tunnels
-func BuildConnections(tunnels [][2]string) map[string][]string {
-	connections := make(map[string][]string)
+func BuildConnections() map[string][]string {
+
+	connections = make(map[string][]string)
 	for _, side := range tunnels {
 		a, b := side[0], side[1]
 		connections[a] = append(connections[a], b)
@@ -10,4 +11,5 @@ func BuildConnections(tunnels [][2]string) map[string][]string {
 	}
 
 	return connections
+
 }

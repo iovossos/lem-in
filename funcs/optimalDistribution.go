@@ -7,43 +7,39 @@ import (
 	"strings"
 )
 
-// AntAssignment stores which ant is assigned to which path and its order on that path.
-type AntAssignment struct {
-	antID     int // The global ant number (starting at 1)
-	pathIndex int // Index into the paths slice (after sorting)
-	order     int // The order of this ant on the path (1 means first ant on that path)
-}
-
 // sortPaths sorts the available paths in ascending order by their length.
-func sortPaths(paths [][]string) [][]string {
+func sortPaths() [][]string {
+
 	// Make a copy so that the original order remains unchanged.
-	sorted := make([][]string, len(paths))
-	copy(sorted, paths)
+	sorted := make([][]string, len(maxFlowPaths))
+	copy(sorted, maxFlowPaths)
 	sort.Slice(sorted, func(i, j int) bool {
 		return len(sorted[i]) < len(sorted[j])
 	})
+
 	return sorted
 }
 
 // assignAnts distributes the ants among the available paths using a greedy strategy.
 // It returns a slice of AntAssignment.
-func assignAnts(totalAnts int, paths [][]string) []AntAssignment {
+func assignAnts() []AntAssignment {
+
 	// Check if we have any valid paths. If not, return an empty assignment.
-	if len(paths) == 0 {
+	if len(maxFlowPaths) == 0 {
 		return []AntAssignment{}
 	}
 
 	assignments := make([]AntAssignment, 0, totalAnts)
 	// assignedCounts[i] holds the number of ants already assigned to paths[i]
-	assignedCounts := make([]int, len(paths))
+	assignedCounts := make([]int, len(maxFlowPaths))
 
 	for ant := 1; ant <= totalAnts; ant++ {
 		// Find the path where the candidate finish time is minimal.
 		bestIdx := 0
 		// Candidate finish time = (assignedCounts + 1) + (len(path) - 1) = assignedCounts + len(path)
-		bestFinish := assignedCounts[0] + len(paths[0])
-		for i := 1; i < len(paths); i++ {
-			candidate := assignedCounts[i] + len(paths[i])
+		bestFinish := assignedCounts[0] + len(maxFlowPaths[0])
+		for i := 1; i < len(maxFlowPaths); i++ {
+			candidate := assignedCounts[i] + len(maxFlowPaths[i])
 			if candidate < bestFinish {
 				bestFinish = candidate
 				bestIdx = i
@@ -62,11 +58,11 @@ func assignAnts(totalAnts int, paths [][]string) []AntAssignment {
 
 // SimulateAnts runs a turn-by-turn simulation of ant movement along their assigned paths.
 // It returns a slice of strings, where each string is one turn's moves in the format "L<antID>-<room>".
-func SimulateAnts(totalAnts int, paths [][]string, assignments []AntAssignment) []string {
+func SimulateAnts(assignments []AntAssignment) []string {
 	// Determine the maximum number of turns required.
 	maxTurn := 0
 	for _, a := range assignments {
-		finish := a.order + len(paths[a.pathIndex]) - 1
+		finish := a.order + len(maxFlowPaths[a.pathIndex]) - 1
 		if finish > maxTurn {
 			maxTurn = finish
 		}
@@ -95,8 +91,8 @@ func SimulateAnts(totalAnts int, paths [][]string, assignments []AntAssignment) 
 				pos := t - a.order + 1
 				// Only print a move if the ant is still en route.
 				// When pos equals len(path), the ant has reached the end.
-				if pos < len(paths[a.pathIndex]) {
-					room := paths[a.pathIndex][pos]
+				if pos < len(maxFlowPaths[a.pathIndex]) {
+					room := maxFlowPaths[a.pathIndex][pos]
 					moves = append(moves, fmt.Sprintf("L%d-%s", antID, room))
 				}
 			}
@@ -112,13 +108,16 @@ func SimulateAnts(totalAnts int, paths [][]string, assignments []AntAssignment) 
 // OptimalAntDistribution combines the above steps:
 // It sorts the given paths, assigns ants to them using a greedy strategy,
 // simulates their movements turn by turn, and returns the list of turn strings.
-func OptimalAntDistribution(totalAnts int, paths [][]string) []string {
-	sortedPaths := sortPaths(paths)
+func OptimalAntDistribution() []string {
+
+	sortedPaths := sortPaths()
+
 	// Check if there are any valid paths.
 	if len(sortedPaths) == 0 {
 		fmt.Println("Valid paths not found")
 		return []string{}
 	}
-	assignments := assignAnts(totalAnts, sortedPaths)
-	return SimulateAnts(totalAnts, sortedPaths, assignments)
+	assignments := assignAnts()
+	fmt.Println("assignments:", assignments)
+	return SimulateAnts(assignments)
 }
