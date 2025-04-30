@@ -1,7 +1,5 @@
 package funcs
 
-import "fmt"
-
 // This file implements a max flow solution to find vertex-disjoint paths
 // using the standard technique of vertex splitting and the Edmonds–Karp algorithm.
 
@@ -15,6 +13,7 @@ func addEdge(graph map[string][]*Edge, from, to string, capacity int) {
 	reverse.rev = forward
 	graph[from] = append(graph[from], forward)
 	graph[to] = append(graph[to], reverse)
+
 }
 
 // transformIn returns the name of the "in" version of a vertex.
@@ -37,7 +36,7 @@ func transformOut(node, start, end string) string {
 
 // BuildFlowNetwork creates the flow network graph using vertex splitting.
 // It returns both the network and a nodeMap to translate transformed node names back to original names.
-func BuildFlowNetwork(connections map[string][]string, start, end string) (map[string][]*Edge, map[string]string) {
+func BuildFlowNetwork(start, end string) (map[string][]*Edge, map[string]string) {
 
 	network := make(map[string][]*Edge)
 	nodeMap := make(map[string]string) // Maps transformed node names to original names.
@@ -188,8 +187,7 @@ func dfsExtract(network map[string][]*Edge, u, sink string, path *[]string) bool
 // ExtractPaths retrieves all vertex-disjoint paths from the flow network.
 // It uses the computed flows (each unit of flow corresponds to one path),
 // and converts the transformed node names back to original room names.
-func ExtractPaths(network map[string][]*Edge, nodeMap map[string]string, source, sink string, flow int) [][]string {
-	var paths [][]string
+func ExtractPaths(network map[string][]*Edge, nodeMap map[string]string, source, sink string, flow int) {
 	for i := 0; i < flow; i++ {
 		var path []string
 		if dfsExtract(network, source, sink, &path) {
@@ -209,23 +207,19 @@ func ExtractPaths(network map[string][]*Edge, nodeMap map[string]string, source,
 					cleanedPath = append(cleanedPath, name)
 				}
 			}
-			paths = append(paths, cleanedPath)
+			maxFlowPaths = append(maxFlowPaths, cleanedPath)
 		}
 	}
-	return paths
 }
 
 // VertexDisjointPaths computes the vertex-disjoint paths using the max flow approach.
-// It returns a slice of paths (each a slice of room names) and the maximum flow value.
 func VertexDisjointPaths() [][]string {
 	// Build the flow network with vertex splitting.
-	network, nodeMap := BuildFlowNetwork(connections, start, end)
+	network, nodeMap := BuildFlowNetwork(start, end)
 	// Compute the maximum flow. The flow value equals the number of vertex-disjoint paths.
 	maxFlowValue := MaxFlow(network, start, end)
 	// Extract the actual paths from the flow network.
-	maxFlowPaths = ExtractPaths(network, nodeMap, start, end, maxFlowValue)
-
-	fmt.Println("[DEBUG] (VertexDisjointPaths) maxFlowPaths", maxFlowPaths)
+	ExtractPaths(network, nodeMap, start, end, maxFlowValue)
 
 	return maxFlowPaths
 }

@@ -1,4 +1,3 @@
-// optimalDistribution.go
 package funcs
 
 import (
@@ -8,26 +7,16 @@ import (
 )
 
 // sortPaths sorts the available paths in ascending order by their length.
-func sortPaths() [][]string {
+func sortPaths() {
 
-	// Make a copy so that the original order remains unchanged.
-	sorted := make([][]string, len(maxFlowPaths))
-	copy(sorted, maxFlowPaths)
-	sort.Slice(sorted, func(i, j int) bool {
-		return len(sorted[i]) < len(sorted[j])
+	sort.Slice(maxFlowPaths, func(i, j int) bool {
+		return len(maxFlowPaths[i]) < len(maxFlowPaths[j])
 	})
-
-	return sorted
 }
 
 // assignAnts distributes the ants among the available paths using a greedy strategy.
 // It returns a slice of AntAssignment.
 func assignAnts() []AntAssignment {
-
-	// Check if we have any valid paths. If not, return an empty assignment.
-	if len(maxFlowPaths) == 0 {
-		return []AntAssignment{}
-	}
 
 	assignments := make([]AntAssignment, 0, totalAnts)
 	// assignedCounts[i] holds the number of ants already assigned to paths[i]
@@ -53,6 +42,7 @@ func assignAnts() []AntAssignment {
 			order:     assignedCounts[bestIdx], // The order number on the chosen path.
 		})
 	}
+
 	return assignments
 }
 
@@ -108,16 +98,14 @@ func SimulateAnts(assignments []AntAssignment) []string {
 // OptimalAntDistribution combines the above steps:
 // It sorts the given paths, assigns ants to them using a greedy strategy,
 // simulates their movements turn by turn, and returns the list of turn strings.
-func OptimalAntDistribution() []string {
+func OptimalAntDistribution() {
 
-	sortedPaths := sortPaths()
+	sortPaths()
 
-	// Check if there are any valid paths.
-	if len(sortedPaths) == 0 {
-		fmt.Println("Valid paths not found")
-		return []string{}
-	}
 	assignments := assignAnts()
-	fmt.Println("assignments:", assignments)
-	return SimulateAnts(assignments)
+
+	result := SimulateAnts(assignments)
+	for _, line := range result {
+		fmt.Println(line)
+	}
 }
