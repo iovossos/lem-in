@@ -53,28 +53,6 @@ The programme prints:
 1. The validated map (echo),
 2. All ants’ moves grouped by turn.
 
-### Example
-```txt
-3            # ants
-##start
-A 0 0        # start room
-##end
-D 4 0        # end room
-B 1 0
-C 2 0
-A-B
-B-C
-C-D
-```
-Output:
-```txt
-L1-B L2-B L3-B
-L1-C L2-C
-L1-D
-L2-D
-L3-C
-L3-D
-```
 
 ## 👥 Contributors
 - Kostas Apostolou  
