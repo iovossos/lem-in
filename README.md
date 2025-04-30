@@ -2,14 +2,9 @@
 
 A Go implementation of the classic Lem-in problem: finding optimal vertex-disjoint paths through a network of rooms and simulating the movement of ants.
 
-## Team
-
-- **Kostas Apostolou**
-- **Yana Kopilova**
-- **Vicky Apostolou**
 
 
-## Features
+## ✨ Key Features
 
 - **Input Parsing & Validation**: Reads an input file defining the number of ants, rooms, and tunnels. Checks for common errors such as:
   - Invalid or missing ant count
@@ -36,17 +31,52 @@ lem-in/
 ├── README.md                  # Project overview and instructions
 ```
 
-## Algorithms
+## 🧠 Algorithm Overview
+1. **Parsing** – strict, fail‑fast scanner; any error aborts with an explanatory message.  
+2. **Max‑flow** – each vertex (except *start*/*end*) is split into **v_in** and **v_out** (capacity = 1) to enforce vertex‑disjointness.  
+3. **Path extraction** – depth‑first pull of flow‑saturated edges translates the residual network back to human paths.  
+4. **Greedy distribution** – ants are queued onto the shortest finishing path each turn (classic *load balancing* heuristic).  
+5. **Simulation** – we iterate over turns, printing only active moves to keep output concise.
 
-- **Parsing**: Validates every line and exits early on errors.
-- **Graph Building**: Converts tunnels into an adjacency list for BFS and flow.
-- **BFS Check**: Ensures that start and end are connected.
-- **Max-Flow (Edmonds–Karp)**: Uses vertex splitting to enforce vertex capacities and finds the maximum number of vertex-disjoint paths.
-- **Ant Assignment**: Sorts paths by length, then assigns ants greedily to minimize the completion time.
-- **Simulation**: Prints each turn’s moves in the format `L<antID>-<room>`.
 
-## Usage
+## 🚀 Getting Started
+### Prerequisites
+* Go 1.22+  
+* A Unix‑like shell (only for running examples)
 
+### Run
 ```bash
-go run . <input_file>
+go run . <path/to/input_file>
 ```
+
+The programme prints:
+1. The validated map (echo),
+2. All ants’ moves grouped by turn.
+
+### Example
+```txt
+3            # ants
+##start
+A 0 0        # start room
+##end
+D 4 0        # end room
+B 1 0
+C 2 0
+A-B
+B-C
+C-D
+```
+Output:
+```txt
+L1-B L2-B L3-B
+L1-C L2-C
+L1-D
+L2-D
+L3-C
+L3-D
+```
+
+## 👥 Contributors
+- Kostas Apostolou  
+- Yana Kopilova  
+- Vicky Apostolou  
