@@ -3,46 +3,41 @@ package funcs
 // This file implements a max flow solution to find vertex-disjoint paths
 // using the standard technique of vertex splitting and the Edmonds–Karp algorithm.
 
+type Edge struct {
+	from     string
+	to       string
+	capacity int
+	flow     int
+	rev      *Edge
+}
+
 // addEdge adds a forward edge (with capacity) and a corresponding reverse edge (with 0 capacity)
 // to the flow network.
+// Adds a forward and reverse edge between two nodes
 func addEdge(graph map[string][]*Edge, from, to string, capacity int) {
-	// Create forward and reverse edges.
 	forward := &Edge{from: from, to: to, capacity: capacity, flow: 0}
 	reverse := &Edge{from: to, to: from, capacity: 0, flow: 0}
 	forward.rev = reverse
 	reverse.rev = forward
 	graph[from] = append(graph[from], forward)
 	graph[to] = append(graph[to], reverse)
-
 }
 
-// transformIn returns the name of the "in" version of a vertex.
-// For the start and end vertices, no splitting is performed.
-func transformIn(node, start, end string) string {
+// Returns "_in" or "_out" versions unless node is start/end
+func transform(node, start, end, suffix string) string {
 	if node == start || node == end {
 		return node
 	}
-	return node + "_in"
+	return node + "_" + suffix
 }
 
-// transformOut returns the name of the "out" version of a vertex.
-// For the start and end vertices, no splitting is performed.
-func transformOut(node, start, end string) string {
-	if node == start || node == end {
-		return node
-	}
-	return node + "_out"
-}
-
-// BuildFlowNetwork creates the flow network graph using vertex splitting.
-// It returns both the network and a nodeMap to translate transformed node names back to original names.
+// BuildFlowNetwork constructs the flow graph with vertex splitting
 func BuildFlowNetwork(start, end string) (map[string][]*Edge, map[string]string) {
-
 	network := make(map[string][]*Edge)
-	nodeMap := make(map[string]string) // Maps transformed node names to original names.
-
-	// Gather all vertices from the connections.
+	nodeMap := make(map[string]string)
 	vertexSet := make(map[string]bool)
+
+	// Collect all unique nodes
 	for u, neighbors := range connections {
 		vertexSet[u] = true
 		for _, v := range neighbors {
@@ -50,64 +45,43 @@ func BuildFlowNetwork(start, end string) (map[string][]*Edge, map[string]string)
 		}
 	}
 
-	// For every vertex, if it is not start or end, split it into "in" and "out" nodes.
-	for v := range vertexSet {
-		if v == start || v == end {
-			// For source and sink, no split is needed.
-			if _, ok := network[v]; !ok {
-				network[v] = []*Edge{}
-			}
-			nodeMap[v] = v
+	// Split non-start/end nodes and add internal edge
+	for node := range vertexSet {
+		if node == start || node == end {
+			network[node] = []*Edge{}
+			nodeMap[node] = node
 		} else {
-			vin := transformIn(v, start, end)
-			vout := transformOut(v, start, end)
-			network[vin] = []*Edge{}
-			network[vout] = []*Edge{}
-			// Connect vin to vout with capacity 1 to enforce the vertex constraint.
-			addEdge(network, vin, vout, 1)
-			nodeMap[vin] = v
-			nodeMap[vout] = v
+			in, out := transform(node, start, end, "in"), transform(node, start, end, "out")
+			network[in] = []*Edge{}
+			network[out] = []*Edge{}
+			addEdge(network, in, out, 1)
+			nodeMap[in], nodeMap[out] = node, node
 		}
 	}
 
-	// To simulate undirected edges, use a set to add each edge only once.
-	edgeAdded := make(map[string]bool)
+	// Add undirected connections with proper node transforms
+	seen := make(map[string]bool)
 	for u, neighbors := range connections {
 		for _, v := range neighbors {
-			// Create a key for the undirected edge based on sorted vertex names.
-			key := ""
-			if u < v {
-				key = u + "_" + v
-			} else {
+			key := u + "_" + v
+			if u > v {
 				key = v + "_" + u
 			}
-			if !edgeAdded[key] {
-				edgeAdded[key] = true
-				// Determine the proper transformed names for u and v.
-				uOut := u
-				if u != start && u != end {
-					uOut = transformOut(u, start, end)
-				}
-				vIn := v
-				if v != start && v != end {
-					vIn = transformIn(v, start, end)
-				}
-				// Add edge from u's output to v's input.
-				addEdge(network, uOut, vIn, 1)
-
-				// Do the reverse direction to simulate an undirected tunnel.
-				vOut := v
-				if v != start && v != end {
-					vOut = transformOut(v, start, end)
-				}
-				uIn := u
-				if u != start && u != end {
-					uIn = transformIn(u, start, end)
-				}
-				addEdge(network, vOut, uIn, 1)
+			if seen[key] {
+				continue
 			}
+			seen[key] = true
+
+			uOut := transform(u, start, end, "out")
+			vIn := transform(v, start, end, "in")
+			addEdge(network, uOut, vIn, 1)
+
+			vOut := transform(v, start, end, "out")
+			uIn := transform(u, start, end, "in")
+			addEdge(network, vOut, uIn, 1)
 		}
 	}
+
 	return network, nodeMap
 }
 

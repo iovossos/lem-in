@@ -6,6 +6,12 @@ import (
 	"strings"
 )
 
+type AntAssignment struct {
+	antID     int // The global ant number (starting at 1)
+	pathIndex int // Index into the paths slice (after sorting)
+	order     int // The order of this ant on the path (1 means first ant on that path)
+}
+
 // sortPaths sorts the available paths in ascending order by their length.
 func sortPaths() {
 

@@ -20,23 +20,6 @@ var (
 	maxFlowPaths     [][]string
 )
 
-// Edge represents a directed edge in the flow network. Used only in maxFlow.go file
-type Edge struct {
-	from     string
-	to       string
-	capacity int
-	flow     int
-	rev      *Edge
-}
-
-// AntAssignment stores which ant is assigned to which path and its order on that path.
-// Used only in optimalDistribution.go file
-type AntAssignment struct {
-	antID     int // The global ant number (starting at 1)
-	pathIndex int // Index into the paths slice (after sorting)
-	order     int // The order of this ant on the path (1 means first ant on that path)
-}
-
 func ParseInput() {
 
 	if len(os.Args) != 2 {
