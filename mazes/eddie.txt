@@ -1,0 +1,17 @@
+69
+##start
+4 2 0
+vossos 5 7
+1 0 4
+9 3 1
+2 10 9
+eddie 7 11
+##end
+3 5 8
+4-eddie
+eddie-vossos
+vossos-2
+1-4
+2-9
+9-3
+1-3
